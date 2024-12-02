@@ -12,12 +12,13 @@ import (
 func main() {
 	// Define the flag for logging behavior
 	logToFile := flag.Bool("logToFile", false, "Set to true to log to file, false to log to console")
+	logTimestamp := flag.Bool("logTimeStamp", true, "Set to true to log timestamps. Timestamps are logged by default in the file")
 
 	// Parse the flags
 	flag.Parse()
 
-	// Initialize the logger based on the flag value
-	logs.Init(*logToFile)
+	// Initialize logger with a timestamp
+	logs.Init(*logToFile, *logTimestamp)
 
 	// URL to monitor and monitoring interval
 	url := "https://example.com"
@@ -31,10 +32,10 @@ func main() {
 		status, elapsed, err := monitor.CheckURL(url)
 		if err != nil {
 			// Log error with improved structure
-			logs.Error(fmt.Errorf("failed to check URL %s: %v (elapsed time: %v)", url, err, elapsed))
+			logs.Error(fmt.Errorf("failed to check URL %s | Elapsed Time: %v | Error: %v", url, elapsed, err))
 		} else {
 			// Log status and response time using the logs package
-			logs.Info(fmt.Sprintf("URL: %s | Status: %d | Response Time: %v", url, status, elapsed))
+			logs.Success(fmt.Sprintf("URL: %s | Response Time: %v | Status: %d", url, elapsed, status))
 		}
 		time.Sleep(interval)
 	}
