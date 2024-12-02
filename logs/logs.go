@@ -21,7 +21,7 @@ func Init(logToFileFlag bool, logTimestamp bool) {
 
 	// If logging to file, initialize the file logger
 	if logToFile {
-		file, err := os.OpenFile("argus.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+		file, err := os.OpenFile("argus.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0600)
 		if err != nil {
 			log.Fatalf("Failed to open log file: %v\n", err)
 		}
