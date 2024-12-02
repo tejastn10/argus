@@ -70,7 +70,10 @@ func LogMessage(level, message string) {
 			logMessage = levelColor.Sprint(paddedLevel) + ": " + message
 		}
 		// Print to console with color formatting
-		color.New(color.Reset).Println(logMessage)
+		_, err := color.New(color.Reset).Println(logMessage)
+		if err != nil {
+			log.Fatalf("Failed to print log message: %v", err)
+		}
 	}
 }
 
