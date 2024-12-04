@@ -21,7 +21,17 @@ func Init(logToFileFlag bool, logTimestamp bool) {
 
 	// If logging to file, initialize the file logger
 	if logToFile {
-		file, err := os.OpenFile("argus.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0600)
+		// Determine the log directory (either local or Docker)
+		logDir := "./output" // Default directory, which will be mounted in Docker
+
+		// Ensure the log directory exists
+		err := ensureLogDirectory(logDir)
+		if err != nil {
+			log.Fatalf("Failed to create output directory: %v\n", err)
+		}
+
+		// Open the log file inside the output directory
+		file, err := os.OpenFile(fmt.Sprintf("%s/argus.log", logDir), os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0600)
 		if err != nil {
 			log.Fatalf("Failed to open log file: %v\n", err)
 		}
@@ -30,6 +40,17 @@ func Init(logToFileFlag bool, logTimestamp bool) {
 		// If not logging to file, log to console
 		Logger = log.New(os.Stdout, "ARGUS: ", log.LstdFlags)
 	}
+}
+
+// ensureLogDirectory creates the output directory if it doesn't exist
+func ensureLogDirectory(logDir string) error {
+	// Check if the directory exists
+	_, err := os.Stat(logDir)
+	if os.IsNotExist(err) {
+		// Create the directory if it doesn't exist
+		err = os.MkdirAll(logDir, 0755)
+	}
+	return err
 }
 
 // LogMessage formats the log message with colored components and prints it
