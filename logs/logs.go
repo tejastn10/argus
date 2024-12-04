@@ -48,7 +48,7 @@ func ensureLogDirectory(logDir string) error {
 	_, err := os.Stat(logDir)
 	if os.IsNotExist(err) {
 		// Create the directory if it doesn't exist
-		err = os.MkdirAll(logDir, 0755)
+		err = os.MkdirAll(logDir, 0750)
 	}
 	return err
 }
