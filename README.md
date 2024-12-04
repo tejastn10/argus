@@ -1,5 +1,6 @@
-
 # Argus 🕵️‍♂️
+
+[![Docker Pulls](https://img.shields.io/docker/pulls/tejastn10/argus)](https://hub.docker.com/r/tejastn10/argus)
 
 Argus is a lightweight and efficient uptime monitoring service written in Go. It periodically checks the availability and response time of a given URL and logs the results. Designed with simplicity, reliability, and extensibility in mind, Argus is a great starting point for developers looking to monitor service health.
 
@@ -27,7 +28,7 @@ Argus is a lightweight and efficient uptime monitoring service written in Go. It
 1. Clone this repository:
 
     ```bash
-    git clone https://github.com/your-username/argus.git
+    git clone https://github.com/tejastn10/argus.git
     cd argus
     ```
 
@@ -47,36 +48,38 @@ Argus is a lightweight and efficient uptime monitoring service written in Go. It
 
 ### Usage
 
-1. Update the `main.go` file with the URL and monitoring interval:
-
-    ```go
-    url := "https://example.com"
-    interval := 30 * time.Second
-    ```
-
-2. Build the project:
+1. **Build the project:**
 
     ```bash
     go build -o argus
     ```
 
-3. Execute the binary:
+2. **Run the service with URL and monitoring interval flags:**
+
+    You can pass the URL and monitoring interval as command-line flags:
 
     ```bash
-    ./argus
+    ./argus -url=https://example.com -interval=30s
     ```
 
-4. Argus will start monitoring the specified URL and log the status, response time, and errors (if any).
+3. Argus will start monitoring the specified URL and log the status, response time, and errors (if any).
+
+4. **Example Docker Usage:**
+
+    If you're running Argus in Docker, you can use the pre-configured `docker-compose.yml` file, which automatically passes the required flags to the container.
+
+    ```bash
+    docker-compose up -d
+    ```
 
 ---
 
 ### Example Output
 
 ```md
-Starting uptime monitoring for <https://example.com> every 30s
-URL: <https://example.com> | Status: true | Response Time: 102ms
-URL: <https://example.com> | Status: false | Error: dial tcp: lookup example.com: no such host
-
+INFO    : Starting uptime monitoring for https://example.com every 30 seconds
+SUCCESS : URL: https://example.com | Response Time: 1.113759875s | Status: 200
+SUCCESS : URL: https://example.com | Response Time: 299.630625ms | Status: 200
 ```
 
 ---
@@ -85,10 +88,8 @@ URL: <https://example.com> | Status: false | Error: dial tcp: lookup example.com
 
 ```md
 argus/
-├── cmd/            # CLI entry point (future enhancement)
+├── logs/           # Core package with console and file logging logic 
 ├── monitor/        # Core package with URL monitoring logic
-├── internal/       # Non-exported modules for internal use
-├── tests/          # Unit and integration tests (future)
 ├── go.mod          # Dependency management
 ├── main.go         # Main application entry point
 └── README.md       # Project documentation
@@ -112,25 +113,19 @@ docker build -t argus .
 docker run -d argus
 ```
 
-### Example Dockerfile
+### Example Docker Compose File
 
-```dockerfile
-# Dockerfile
-FROM golang:1.20 as builder
-WORKDIR /app
-COPY . .
-RUN go build -o argus main.go
-
-# Deploy stage
-FROM alpine:latest
-WORKDIR /root/
-COPY --from=builder /app/argus .
-ENTRYPOINT ["./argus"]
-```
+We have included an example [docker-compose.yml](./docker-compose.yml) file that can be used to run Argus easily in a Docker container.
 
 ---
 
-## Contributing
+## Docker Registry
+
+You can pull the Argus Docker image directly from the Docker Hub registry.
+
+Docker Hub Link: [tejastn10/argus](https://hub.docker.com/r/tejastn10/argus)
+
+Contributing
 
 Contributions are welcome! Please open an issue or submit a pull request.
 
