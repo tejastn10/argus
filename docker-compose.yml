@@ -1,0 +1,19 @@
+services:
+  argus:
+    image: tejastn10/argus:latest # Replace with your image URL from Docker Hub
+    container_name: argus
+
+    volumes:
+      - ./output:/app/output # Mounts the local "output" folder to the container
+    restart: unless-stopped
+
+    command:
+      [
+        "./argus",
+        "-url",
+        "https://example.com",
+        "-interval",
+        "10",
+        "-logToFile",
+        "true",
+      ]
