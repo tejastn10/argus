@@ -1,18 +1,30 @@
-# Start with the official Go image
-FROM golang:1.23
+# Stage 1: Build the application
+FROM golang:1.23 as builder
 
-# Set the working directory
+# Set the working directory inside the builder stage
 WORKDIR /app
 
 # Copy the Go module files and download dependencies
 COPY go.mod go.sum ./
 RUN go mod download
 
-# Copy the application code
+# Copy the application source code
 COPY . .
 
-# Build the Go application
-RUN go build -o argus
+# Build the Go application statically
+RUN CGO_ENABLED=0 GOOS=linux go build -o argus
 
-# Set the default command
+# Stage 2: Create a lightweight runtime image
+FROM alpine:latest
+
+# Install certificates for HTTPS support
+RUN apk add --no-cache ca-certificates
+
+# Set the working directory inside the runtime image
+WORKDIR /root/
+
+# Copy the binary from the builder stage
+COPY --from=builder /app/argus .
+
+# Set the default command to run the binary
 CMD ["./argus"]
