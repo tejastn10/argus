@@ -31,7 +31,6 @@ jobs:
         with:
           context: .
           push: true
-          platforms: linux/amd64 # Build only for amd64
           tags: |
             tejastn10/argus:latest
             tejastn10/argus:${{ github.ref_name }}
