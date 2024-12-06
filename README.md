@@ -6,12 +6,12 @@ Argus is a lightweight and efficient uptime monitoring service written in Go. It
 
 ## Features
 
-- ✅ Periodic URL monitoring
-- ✅ Response time measurement
-- ✅ Logs URL status (up or down) with error details
-- ✅ Customizable monitoring intervals
-- ✅ Lightweight and fast
-- ✅ Easy to extend and deploy
+- [x] Periodic URL monitoring
+- [x] Response time measurement
+- [x] Logs URL status (up or down) with error details
+- [x] Customizable monitoring intervals
+- [x] Lightweight and fast
+- [x] Easy to extend and deploy
 
 ## Getting Started
 
