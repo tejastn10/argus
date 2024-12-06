@@ -14,16 +14,16 @@ import (
 // MonitorURL checks the URL and returns the HTTP status code, response time, and any error.
 // It enforces HTTPS and implements a timeout with retry logic.
 // If retryCount is not provided or is 0, it defaults to 3 retries.
-func MonitorURL(urlString string, retryCount int, backoffDuration time.Duration) (int, time.Duration, error) {
+func MonitorURL(urlString string, retryCount int, initialBackoff time.Duration) (int, time.Duration, error) {
 	// Set default retry count if not provided
 	if retryCount == 0 {
 		retryCount = 3
 	}
 
 	// Set default backoff duration if not provided or zero
-	if backoffDuration <= 0 {
+	if initialBackoff <= 0 {
 		logs.Warning("Invalid backoffDuration provided. Enforcing minimum value of 3 seconds.")
-		backoffDuration = 3 * time.Second
+		initialBackoff = 3 * time.Second
 	}
 
 	// Ensure the URL is valid and parse it
@@ -51,7 +51,7 @@ func MonitorURL(urlString string, retryCount int, backoffDuration time.Duration)
 	var response *http.Response
 	var elapsed time.Duration
 
-	// Retry logic with backoff
+	// Retry logic with exponential backoff
 	for attempt := 1; attempt <= retryCount; attempt++ {
 		start := time.Now()
 		response, lastError = client.Get(urlString)
@@ -74,11 +74,10 @@ func MonitorURL(urlString string, retryCount int, backoffDuration time.Duration)
 			return response.StatusCode, elapsed, lastError
 		}
 
-		// Backoff before retrying
-		if attempt < retryCount {
-			logs.Warning(fmt.Sprintf("Backoff before retrying... Attempt %d of %d. Waiting for %v", attempt, retryCount, backoffDuration))
-			time.Sleep(backoffDuration)
-		}
+		// Exponential backoff logic
+		backoffDuration := initialBackoff * time.Duration(1<<uint(attempt-1)) // Exponential backoff
+		logs.Warning(fmt.Sprintf("Backoff before retrying... Attempt %d of %d. Waiting for %v", attempt, retryCount, backoffDuration))
+		time.Sleep(backoffDuration)
 	}
 
 	// If all retries failed, return the last error encountered and the response status code if available
