@@ -69,6 +69,8 @@ func LogMessage(level, message string) {
 		levelColor = color.New(color.FgYellow)
 	case "ERROR":
 		levelColor = color.New(color.FgRed)
+	case "FATAL":
+		levelColor = color.New(color.FgHiRed)
 	default:
 		levelColor = color.New(color.FgWhite)
 	}
@@ -116,6 +118,12 @@ func Warning(message string) {
 // Error logs error messages
 func Error(err error) {
 	LogMessage("ERROR", err.Error())
+}
+
+// Fatal logs fatal messages and exits the process
+func Fatal(message string) {
+	LogMessage("FATAL", message)
+	os.Exit(1)
 }
 
 // getTimestamp returns the current timestamp as a string in the format YYYY-MM-DD HH:MM:SS
