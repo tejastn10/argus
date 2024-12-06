@@ -76,7 +76,7 @@ func MonitorURL(urlString string, retryCount int, initialBackoff time.Duration) 
 
 		// Exponential backoff logic
 		backoffDuration := initialBackoff * time.Duration(1<<uint(attempt-1)) // Exponential backoff
-		logs.Warning(fmt.Sprintf("Backoff before retrying... Attempt %d of %d. Waiting for %v", attempt, retryCount, backoffDuration))
+		logs.Warning(fmt.Sprintf("Backoff before retrying... Attempt %d of %d. Waiting for %v. Error: %v", attempt, retryCount, backoffDuration, lastError))
 		time.Sleep(backoffDuration)
 	}
 
