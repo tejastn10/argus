@@ -38,16 +38,38 @@ func main() {
 	logs.Info(fmt.Sprintf("Starting uptime monitoring for %s every %v seconds with %d retries and %d seconds backoff duration",
 		*url, *interval, *retryCount, *backoffDuration))
 
+	// Variable to track consecutive failures
+	failureCount := 0
+
 	// Monitoring loop
 	for {
-		status, elapsed, err := monitor.CheckURL(*url)
+		// Convert backoffDuration to time.Duration
+		backoff := time.Duration(*backoffDuration) * time.Second
+
+		// Call MonitorURL with retryCount and backoffDuration
+		status, elapsed, err := monitor.MonitorURL(*url, *retryCount, backoff)
 		if err != nil {
+			// Increment failure count
+			failureCount++
+
 			// Log error with improved structure
-			logs.Error(fmt.Errorf("failed to check URL %s | Elapsed Time: %v | Error: %v", *url, elapsed, err))
+			logs.Error(fmt.Errorf("URL: %s | Elapsed Time: %v | Error: %v | Failure Count: %d", *url, elapsed, err, failureCount))
+
+			// If 5 consecutive failures occur, print the message and break the loop
+			if failureCount >= 5 {
+				logs.Warning(fmt.Sprintf("Service is down: 5 consecutive failures detected for URL %s. Please check your server logs and monitoring systems for further details.", *url))
+				logs.Fatal("Stopping monitoring due to 5 consecutive failures.")
+				break
+			}
 		} else {
 			// Log status and response time using the logs package
 			logs.Success(fmt.Sprintf("URL: %s | Response Time: %v | Status: %d", *url, elapsed, status))
+
+			// Reset failure count on success
+			failureCount = 0
 		}
+
+		// Wait for the next monitoring interval
 		time.Sleep(time.Duration(*interval) * time.Second)
 	}
 }
