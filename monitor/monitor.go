@@ -74,8 +74,14 @@ func MonitorURL(urlString string, retryCount int, initialBackoff time.Duration) 
 			return response.StatusCode, elapsed, lastError
 		}
 
-		// Exponential backoff logic
-		backoffDuration := initialBackoff * time.Duration(1<<uint(attempt-1)) // Exponential backoff
+		// Exponential backoff logic with safe overflow check
+		backoffMultiplier := int64(1) << (attempt - 1) // Safe calculation for power of two
+		if backoffMultiplier > math.MaxInt64/int64(initialBackoff) {
+			logs.Error(errors.New("exponential backoff duration overflow; capping backoff duration"))
+			backoffMultiplier = math.MaxInt64 / int64(initialBackoff)
+		}
+
+		backoffDuration := time.Duration(backoffMultiplier) * initialBackoff
 		logs.Warning(fmt.Sprintf("Backoff before retrying... Attempt %d of %d. Waiting for %v. Error: %v", attempt, retryCount, backoffDuration, lastError))
 		time.Sleep(backoffDuration)
 	}
