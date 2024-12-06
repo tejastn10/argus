@@ -2,15 +2,30 @@ package monitor
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"net/url"
 	"strings"
 	"time"
+
+	"github.com/tejastn10/argus/logs"
 )
 
-// CheckURL checks the URL and returns the HTTP status code, response time, and any error.
-// It enforces HTTPS and implements a timeout.
-func CheckURL(urlString string) (int, time.Duration, error) {
+// MonitorURL checks the URL and returns the HTTP status code, response time, and any error.
+// It enforces HTTPS and implements a timeout with retry logic.
+// If retryCount is not provided or is 0, it defaults to 3 retries.
+func MonitorURL(urlString string, retryCount int, backoffDuration time.Duration) (int, time.Duration, error) {
+	// Set default retry count if not provided
+	if retryCount == 0 {
+		retryCount = 3
+	}
+
+	// Set default backoff duration if not provided or zero
+	if backoffDuration <= 0 {
+		logs.Warning("Invalid backoffDuration provided. Enforcing minimum value of 3 seconds.")
+		backoffDuration = 3 * time.Second
+	}
+
 	// Ensure the URL is valid and parse it
 	parsedURL, err := url.Parse(urlString)
 	if err != nil || !parsedURL.IsAbs() {
@@ -32,18 +47,44 @@ func CheckURL(urlString string) (int, time.Duration, error) {
 		Timeout: 10 * time.Second, // 10 second timeout
 	}
 
-	start := time.Now()
-	response, err := client.Get(urlString)
-	elapsed := time.Since(start)
+	var lastError error
+	var response *http.Response
+	var elapsed time.Duration
 
-	if err != nil {
-		return 0, elapsed, err // Return 0 if there is an error, indicating no valid status code
+	// Retry logic with backoff
+	for attempt := 1; attempt <= retryCount; attempt++ {
+		start := time.Now()
+		response, lastError = client.Get(urlString)
+		elapsed = time.Since(start)
+
+		// If the request was successful and returned a valid status code
+		if lastError == nil && response.StatusCode >= 200 && response.StatusCode < 300 {
+			return response.StatusCode, elapsed, nil
+		}
+
+		// If the request failed, log the error and retry after backoff
+		if lastError != nil {
+			lastError = errors.New("error during request: " + lastError.Error())
+		} else {
+			lastError = errors.New("non-success status code: " + http.StatusText(response.StatusCode))
+		}
+
+		// If the response was received but the status code was not successful, return the status code immediately
+		if response != nil && (response.StatusCode < 200 || response.StatusCode >= 300) {
+			return response.StatusCode, elapsed, lastError
+		}
+
+		// Backoff before retrying
+		if attempt < retryCount {
+			logs.Warning(fmt.Sprintf("Backoff before retrying... Attempt %d of %d. Waiting for %v", attempt, retryCount, backoffDuration))
+			time.Sleep(backoffDuration)
+		}
 	}
 
-	// Ensure the connection was successful (2xx status codes)
-	if response.StatusCode < 200 || response.StatusCode >= 300 {
-		return response.StatusCode, elapsed, errors.New("non-success status code")
+	// If all retries failed, return the last error encountered and the response status code if available
+	if response != nil {
+		return response.StatusCode, elapsed, lastError
 	}
 
-	return response.StatusCode, elapsed, nil
+	return 0, elapsed, lastError
 }
