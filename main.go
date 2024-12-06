@@ -35,7 +35,8 @@ func main() {
 	logs.Init(*logToFile, *logTimestamp)
 
 	// Log the start of the monitoring process
-	logs.Info(fmt.Sprintf("Starting uptime monitoring for %s every %v seconds", *url, *interval))
+	logs.Info(fmt.Sprintf("Starting uptime monitoring for %s every %v seconds with %d retries and %d seconds backoff duration",
+		*url, *interval, *retryCount, *backoffDuration))
 
 	// Monitoring loop
 	for {
