@@ -3,11 +3,12 @@ package monitor
 import (
 	"net/http"
 	"testing"
+	"time"
 )
 
-// TestCheckURLTable tests the CheckURL function using a table-driven approach.
+// TestMonitorURLTable tests the MonitorURL function using a table-driven approach.
 // Each test case specifies a URL, the expected status code, and whether an error is expected.
-func TestCheckURLTable(t *testing.T) {
+func TestMonitorURLTable(t *testing.T) {
 	tests := []struct {
 		name       string // Name of the test case
 		url        string // URL to test
@@ -22,12 +23,12 @@ func TestCheckURLTable(t *testing.T) {
 	for _, tt := range tests {
 		// Run each test case as a sub-test
 		t.Run(tt.name, func(t *testing.T) {
-			// Call the CheckURL function with the test case URL
-			statusCode, _, err := CheckURL(tt.url)
+			// Call the MonitorURL function with the test case URL
+			statusCode, _, err := MonitorURL(tt.url, 3, 2*time.Second)
 
 			// Check if the error behavior matches the expectation
 			if (err != nil) != tt.wantErr {
-				t.Errorf("CheckURL() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("MonitorURL() error = %v, wantErr %v", err, tt.wantErr)
 			}
 
 			// Verify the returned status code, but only if no error is expected
