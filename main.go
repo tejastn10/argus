@@ -15,11 +15,21 @@ func main() {
 	logTimestamp := flag.Bool("logTimeStamp", true, "Set to true to log timestamps. Timestamps are logged by default in the file")
 	url := flag.String("url", "https://example.com", "The URL to monitor. Default is https://example.com")
 	interval := flag.Int("interval", 30, "The monitoring interval in seconds. Default is 30 seconds")
-	retryCount := flag.Int("retryCount", 3, "The number of retries for monitoring requests. Default is 3 retries")
-	backoffDuration := flag.Int("backoffDuration", 2, "The backoff duration (in seconds) between retries. Default is 2 seconds")
+	retryCount := flag.Int("retryCount", 3, "The number of retries for monitoring requests. Must be >= 3. Default is 3 retries")
+	backoffDuration := flag.Int("backoffDuration", 3, "The backoff duration (in seconds) between retries. Must be >= 3. Default is 3 seconds")
 
 	// Parse the flags
 	flag.Parse()
+
+	// Validate and enforce minimum values for retryCount and backoffDuration
+	if *retryCount < 3 {
+		logs.Warning("Invalid retryCount provided. Enforcing minimum value of 3.")
+		*retryCount = 3
+	}
+	if *backoffDuration < 3 {
+		logs.Warning("Invalid backoffDuration provided. Enforcing minimum value of 3 seconds.")
+		*backoffDuration = 3
+	}
 
 	// Initialize logger with a timestamp
 	logs.Init(*logToFile, *logTimestamp)
