@@ -3,6 +3,7 @@ package monitor
 import (
 	"errors"
 	"fmt"
+	"math"
 	"net/http"
 	"net/url"
 	"strings"
@@ -59,6 +60,9 @@ func MonitorURL(urlString string, retryCount int, initialBackoff time.Duration) 
 
 		// If the request was successful and returned a valid status code
 		if lastError == nil && response.StatusCode >= 200 && response.StatusCode < 300 {
+			if response != nil {
+				defer response.Body.Close() // Ensure response body is closed
+			}
 			return response.StatusCode, elapsed, nil
 		}
 
@@ -70,8 +74,11 @@ func MonitorURL(urlString string, retryCount int, initialBackoff time.Duration) 
 		}
 
 		// If the response was received but the status code was not successful, return the status code immediately
-		if response != nil && (response.StatusCode < 200 || response.StatusCode >= 300) {
-			return response.StatusCode, elapsed, lastError
+		if response != nil {
+			defer response.Body.Close() // Ensure response body is closed
+			if response.StatusCode < 200 || response.StatusCode >= 300 {
+				return response.StatusCode, elapsed, lastError
+			}
 		}
 
 		// Exponential backoff logic with safe overflow check
@@ -88,6 +95,7 @@ func MonitorURL(urlString string, retryCount int, initialBackoff time.Duration) 
 
 	// If all retries failed, return the last error encountered and the response status code if available
 	if response != nil {
+		defer response.Body.Close() // Ensure response body is closed
 		return response.StatusCode, elapsed, lastError
 	}
 
