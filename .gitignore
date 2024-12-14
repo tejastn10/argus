@@ -5,8 +5,10 @@
 *.so
 *.dylib
 
-# Test binary, build cache, and output of `go test`
+# Test binary, built with `go test -c`
 *.test
+
+# Output of the go coverage tool, specifically when used with LiteIDE
 *.out
 
 # Output of the go coverage tool
@@ -15,6 +17,9 @@
 # Go workspace file
 go.work
 go.work.sum
+
+# env file
+.env
 
 # IDE and Editor configuration
 .vscode/
