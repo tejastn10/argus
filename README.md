@@ -4,7 +4,8 @@
 [![Docker Pulls](https://img.shields.io/docker/pulls/tejastn10/argus)](https://hub.docker.com/r/tejastn10/argus)
 ![Docker Image Size](https://img.shields.io/docker/image-size/tejastn10/argus)
 ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/tejastn10/argus)
-![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/tejastn10/argus/docker-image.yml)
+[![Build and Publish Docker Image](https://github.com/tejastn10/argus/actions/workflows/docker-image.yml/badge.svg)](https://github.com/tejastn10/argus/actions/workflows/docker-image.yml)
+[![Unit Tests](https://github.com/tejastn10/argus/actions/workflows/unit-test.yml/badge.svg)](https://github.com/tejastn10/argus/actions/workflows/unit-test.yml)
 
 Argus is a lightweight and efficient uptime monitoring service written in Go. It periodically checks the availability and response time of a given URL and logs the results. Designed with simplicity, reliability, and extensibility in mind, Argus is a great starting point for developers looking to monitor service health.
 
