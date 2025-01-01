@@ -5,17 +5,27 @@ on:
     tags:
       - "v*.*.*" # Trigger the workflow when a version tag is pushed
 
+env:
+  REGISTRY_DOCKERHUB: docker.io
+  REGISTRY_GHCR: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
 jobs:
-  build:
-    name: Build and Release
+  build-and-push:
+    name: Build and Push Images
     runs-on: ubuntu-latest
+    permissions:
+      contents: write # Needed for creating releases
+      packages: write # Needed for GHCR
 
     steps:
       # Checkout the code
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # Set up Docker Buildx
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -26,13 +36,63 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      # Build and push the Docker image with both version and latest tags
+      # Log in to GitHub Container Registry
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY_GHCR }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.TOKEN }}
+
+      # Extract metadata for Docker
+      - name: Extract Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            ${{ env.REGISTRY_DOCKERHUB }}/${{ github.repository }}
+            ${{ env.REGISTRY_GHCR }}/${{ github.repository }}
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      # Build and push Docker image
       - name: Build and push Docker image
         uses: docker/build-push-action@v6
         with:
           context: .
           push: true
           platforms: linux/amd64,linux/arm64
-          tags: |
-            tejastn10/argus:latest
-            tejastn10/argus:${{ github.ref_name }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      # Create GitHub Release
+      - name: Generate Release Notes
+        id: release-notes
+        run: |
+          echo "## Docker Images" >> release-notes.md
+          echo "- \`${{ env.REGISTRY_DOCKERHUB }}/${{ github.repository }}:${{ github.ref_name }}\`" >> release-notes.md
+          echo "- \`${{ env.REGISTRY_GHCR }}/${{ github.repository }}:${{ github.ref_name }}\`" >> release-notes.md
+          echo "" >> release-notes.md
+          echo "## Supported Platforms" >> release-notes.md
+          echo "- linux/amd64" >> release-notes.md
+          echo "- linux/arm64" >> release-notes.md
+          echo "" >> release-notes.md
+          if [ -f CHANGELOG.md ]; then
+            echo "## Changelog" >> release-notes.md
+            echo "" >> release-notes.md
+            cat CHANGELOG.md >> release-notes.md
+          fi
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: Release ${{ github.ref_name }}
+          body_path: release-notes.md
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
