@@ -73,7 +73,7 @@ jobs:
       - name: Generate Release Notes
         id: release-notes
         run: |
-          echo "# Argus v1.3.1 🚀" >> release-notes.md
+          echo "# Argus ${{ github.ref_name }} 🚀" >> release-notes.md
           echo "" >> release-notes.md
           echo "## Highlights" >> release-notes.md
           echo "" >> release-notes.md
