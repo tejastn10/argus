@@ -73,6 +73,12 @@ jobs:
       - name: Generate Release Notes
         id: release-notes
         run: |
+          echo "# Argus v1.3.1 🚀" >> release-notes.md
+          echo "" >> release-notes.md
+          echo "## Highlights" >> release-notes.md
+          echo "" >> release-notes.md
+          echo "## Changelog" >> release-notes.md
+          echo "" >> release-notes.md
           echo "## Docker Images" >> release-notes.md
           echo "- \`${{ env.REGISTRY_DOCKERHUB }}/${{ github.repository }}:${{ github.ref_name }}\`" >> release-notes.md
           echo "- \`${{ env.REGISTRY_GHCR }}/${{ github.repository }}:${{ github.ref_name }}\`" >> release-notes.md
@@ -81,16 +87,21 @@ jobs:
           echo "- linux/amd64" >> release-notes.md
           echo "- linux/arm64" >> release-notes.md
           echo "" >> release-notes.md
-          if [ -f CHANGELOG.md ]; then
-            echo "## Changelog" >> release-notes.md
-            echo "" >> release-notes.md
-            cat CHANGELOG.md >> release-notes.md
-          fi
+          echo "## How to Use" >> release-notes.md
+          echo "" >> release-notes.md
+          echo "- Pull the latest Docker image:" >> release-notes.md
+          echo "  \`\`\`bash" >> release-notes.md
+          echo "  docker pull ${{ env.REGISTRY_DOCKERHUB }}/${{ github.repository }}:latest" >> release-notes.md
+          echo "  \`\`\`" >> release-notes.md
+          echo "- Or use a specific version:" >> release-notes.md
+          echo "  \`\`\`bash" >> release-notes.md
+          echo "  docker pull ${{ env.REGISTRY_DOCKERHUB }}/${{ github.repository }}:${{ github.ref_name }}" >> release-notes.md
+          echo "  \`\`\`" >> release-notes.md
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          name: Release ${{ github.ref_name }}
+          name: ${{ github.ref_name }}
           body_path: release-notes.md
           draft: false
           prerelease: false
