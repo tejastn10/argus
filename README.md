@@ -1,22 +1,25 @@
 # Argus 🕵️‍♂️
 
-![Docker Image Version](https://img.shields.io/docker/v/tejastn10/argus)
-[![Docker Pulls](https://img.shields.io/docker/pulls/tejastn10/argus)](https://hub.docker.com/r/tejastn10/argus)
-![Docker Image Size](https://img.shields.io/docker/image-size/tejastn10/argus)
-![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/tejastn10/argus)
-[![Build and Publish Docker Image](https://github.com/tejastn10/argus/actions/workflows/docker-image.yml/badge.svg)](https://github.com/tejastn10/argus/actions/workflows/docker-image.yml)
-[![Unit Tests](https://github.com/tejastn10/argus/actions/workflows/unit-test.yml/badge.svg)](https://github.com/tejastn10/argus/actions/workflows/unit-test.yml)
+![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/tejastn10/argus?logo=go)
+![Docker Image Version](https://img.shields.io/docker/v/tejastn10/argus?logo=docker)
+[![Docker Pulls](https://img.shields.io/docker/pulls/tejastn10/argus?logo=docker)](https://hub.docker.com/r/tejastn10/argus)
+![Docker Image Size](https://img.shields.io/docker/image-size/tejastn10/argus?logo=docker)
+[![Unit Tests](https://github.com/tejastn10/argus/actions/workflows/unit-test.yml/badge.svg?logo=github)](https://github.com/tejastn10/argus/actions/workflows/unit-test.yml)
+[![Build and Publish Docker Image](https://github.com/tejastn10/argus/actions/workflows/docker-image.yml/badge.svg?logo=github)](https://github.com/tejastn10/argus/actions/workflows/docker-image.yml)
+![License](https://img.shields.io/badge/License-MIT-yellow?logo=open-source-initiative&logoColor=white)
 
 Argus is a lightweight and efficient uptime monitoring service written in Go. It periodically checks the availability and response time of a given URL and logs the results. Designed with simplicity, reliability, and extensibility in mind, Argus is a great starting point for developers looking to monitor service health.
 
-## Features
+## Features 🌟
 
-- [x] Periodic URL monitoring
-- [x] Response time measurement
-- [x] Logs URL status (up or down) with error details
-- [x] Customizable monitoring intervals
-- [x] Lightweight and fast
-- [x] Easy to extend and deploy
+- **Periodic URL Monitoring**: Monitor the availability of any URL at regular intervals.
+- **Response Time Measurement**: Measure the time it takes for the URL to respond.
+- **Status Logging**: Logs the URL status (up or down) along with error details.
+- **Customizable Intervals**: Set your preferred monitoring interval (e.g., every 30 seconds).
+- **Lightweight and Fast**: Simple design for quick execution and minimal resource usage.
+- **Extendable**: Easy to add new features, such as email notifications or logging mechanisms.
+
+---
 
 ## Getting Started
 
@@ -26,9 +29,7 @@ Argus is a lightweight and efficient uptime monitoring service written in Go. It
 - [Git](https://git-scm.com/) for version control (optional).
 - (Optional) Docker for containerized deployment.
 
----
-
-### Installation
+### Installation ⚙️
 
 1. Clone this repository:
 
@@ -89,7 +90,7 @@ SUCCESS : URL: https://example.com | Response Time: 299.630625ms | Status: 200
 
 ---
 
-## Project Structure
+## Project Structure 📂
 
 ```md
 argus/
@@ -130,11 +131,11 @@ You can pull the Argus Docker image directly from the Docker Hub registry.
 
 Docker Hub Link: [tejastn10/argus](https://hub.docker.com/r/tejastn10/argus)
 
-Contributing
+### Contributing 🤝
 
-Contributions are welcome! Please open an issue or submit a pull request.
+Contributions are welcome! Feel free to open an issue or submit a pull request if you have ideas to enhance Argus.
 
-### To-Do
+### To-Do ✅
 
 - Add support for email notifications on downtime.
 - Implement a REST API for managing monitored URLs.
@@ -143,13 +144,13 @@ Contributions are welcome! Please open an issue or submit a pull request.
 
 ---
 
-## License
+## License 📜
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
 ---
 
-## Acknowledgments
+## Acknowledgments 🙌
 
 - Inspired by the mythological **Argus**, the all-seeing guardian.
 - Built with ❤️ and Go.
