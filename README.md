@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="logo.svg" alt="Logo">
+</p>
+
 # Argus 🕵️‍♂️
 
 ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/tejastn10/argus?logo=go)
